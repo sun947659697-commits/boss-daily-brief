@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { parseCsvRows, summarizeBusiness, toCsvRows } from "../src/analytics.js";
 
 const sampleEntries = [
@@ -80,6 +81,40 @@ test("parseCsvRows imports numeric and boolean fields", () => {
   assert.equal(rows[0].units, 58);
   assert.equal(rows[0].promo, false);
   assert.equal(rows[0].note, "BBQ sold fastest");
+});
+
+test("parseCsvRows imports the real sosis sales headers", () => {
+  const rows = parseCsvRows(`date,location,product,price,quantity,sauce_count
+2026-07-12,夜市,Sosis 4 Sisi,8000,87,
+2026-07-12,路边,普通淀粉肠,5000,36,8`);
+
+  assert.equal(rows.length, 2);
+  assert.equal(rows[0].stall, "夜市");
+  assert.equal(rows[0].product, "Sosis 4 Sisi");
+  assert.equal(rows[0].units, 87);
+  assert.equal(rows[0].sauceCount, 0);
+  assert.equal(rows[1].stall, "路边");
+  assert.equal(rows[1].product, "普通淀粉肠");
+  assert.equal(rows[1].sauceCount, 8);
+});
+
+test("parseCsvRows skips real sales rows without a recorded quantity", () => {
+  const rows = parseCsvRows(`date,location,product,price,quantity,sauce_count
+2026-06-07,夜市,普通淀粉肠,5000,, 
+2026-06-08,夜市,普通淀粉肠,5000,20,3`);
+
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].date, "2026-06-08");
+  assert.equal(rows[0].units, 20);
+});
+
+test("real sosis sales seed imports into analysis entries", () => {
+  const rows = parseCsvRows(readFileSync("data/sosis-sales.csv", "utf8"));
+
+  assert.equal(rows.length, 65);
+  assert.equal(rows.reduce((sum, row) => sum + row.units, 0), 2845);
+  assert.equal(rows.at(-1).product, "普通淀粉肠");
+  assert.equal(rows.at(-1).sauceCount, 9);
 });
 
 test("toCsvRows exports rows that can be imported again", () => {
