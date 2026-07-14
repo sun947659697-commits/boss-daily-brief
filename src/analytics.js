@@ -1,5 +1,6 @@
 const CSV_HEADERS = [
   "date",
+  "vehicle",
   "stall",
   "product",
   "units",
@@ -17,7 +18,7 @@ const CSV_HEADERS = [
 ];
 
 export function summarizeBusiness(entries, today = new Date()) {
-  const normalized = normalizeEntries(entries).sort((a, b) => a.date.localeCompare(b.date));
+  const normalized = aggregateEntriesByDate(normalizeEntries(entries)).sort((a, b) => a.date.localeCompare(b.date));
   const todayKey = toDateKey(today);
   const todayEntry = findEntryForDate(normalized, todayKey) ?? normalized.at(-1);
 
@@ -84,6 +85,12 @@ export function toCsvRows(entries) {
   return `${lines.join("\n")}\n`;
 }
 
+export function filterEntriesByVehicle(entries, vehicle = "all") {
+  const normalized = normalizeEntries(entries);
+  if (!vehicle || vehicle === "all") return normalized;
+  return normalized.filter((entry) => entry.vehicle === vehicle);
+}
+
 export function normalizeEntry(entry) {
   const units = toNumber(entry.units);
   const price = toNumber(entry.price);
@@ -94,6 +101,7 @@ export function normalizeEntry(entry) {
 
   return {
     date: String(entry.date || toDateKey(new Date())),
+    vehicle: String(entry.vehicle || inferVehicle(entry.stall)),
     stall: String(entry.stall || "Main Stall"),
     product: String(entry.product || "Sosis"),
     units,
@@ -119,6 +127,45 @@ export function normalizeEntries(entries) {
 
 function emptyEntry(date) {
   return normalizeEntry({ date, units: 0, price: 0, cost: 0, extraCost: 0 });
+}
+
+function aggregateEntriesByDate(entries) {
+  const map = new Map();
+  for (const entry of entries) {
+    const current = map.get(entry.date) || {
+      ...entry,
+      vehicle: "all",
+      stall: "All",
+      product: "Mixed",
+      units: 0,
+      price: 0,
+      cost: 0,
+      extraCost: 0,
+      staff: 0,
+      inventory: 0,
+      returningCustomers: 0,
+      sauceCount: 0,
+      promo: false,
+      revenue: 0,
+      profit: 0
+    };
+
+    current.units += entry.units;
+    current.extraCost += entry.extraCost;
+    current.staff += entry.staff;
+    current.inventory += entry.inventory;
+    current.returningCustomers += entry.returningCustomers;
+    current.sauceCount += entry.sauceCount;
+    current.promo = current.promo || entry.promo;
+    current.revenue += entry.revenue;
+    current.profit += entry.profit;
+    current.price = current.units ? Math.round(current.revenue / current.units) : 0;
+    current.cost = current.units ? Math.round((current.revenue - current.profit - current.extraCost) / current.units) : 0;
+    current.weather = mergeWeather(current.weather, entry.weather);
+    current.traffic = mergeTraffic(current.traffic, entry.traffic);
+    map.set(entry.date, current);
+  }
+  return [...map.values()];
 }
 
 function calculateBusinessIndex(today, previousDay, previousWeek, trend7) {
@@ -245,11 +292,32 @@ function canonicalHeader(header) {
   const normalized = header.trim().toLowerCase();
   const aliases = {
     location: "stall",
+    car: "vehicle",
     quantity: "units",
     sauce_count: "sauceCount",
     saucecount: "sauceCount"
   };
   return aliases[normalized] || header;
+}
+
+function inferVehicle(stall) {
+  const value = String(stall || "").trim().toLowerCase();
+  if (["夜市", "night market", "pasar malam"].includes(value)) return "1号车";
+  if (["路边", "roadside", "pinggir jalan"].includes(value)) return "2号车";
+  return "1号车";
+}
+
+function mergeWeather(current, next) {
+  if (current === "rain" || next === "rain") return "rain";
+  if (current === "cloudy" || next === "cloudy") return "cloudy";
+  if (current === "sunny" || next === "sunny") return "sunny";
+  return "normal";
+}
+
+function mergeTraffic(current, next) {
+  if (current === "high" || next === "high") return "high";
+  if (current === "low" || next === "low") return "low";
+  return "normal";
 }
 
 function hasRecordedUnits(headers, row) {
