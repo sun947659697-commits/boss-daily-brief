@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { parseCsvRows, summarizeBusiness, toCsvRows } from "../src/analytics.js";
+import { filterEntriesByVehicle, parseCsvRows, summarizeBusiness, toCsvRows } from "../src/analytics.js";
 
 const sampleEntries = [
   {
@@ -90,10 +90,12 @@ test("parseCsvRows imports the real sosis sales headers", () => {
 
   assert.equal(rows.length, 2);
   assert.equal(rows[0].stall, "夜市");
+  assert.equal(rows[0].vehicle, "1号车");
   assert.equal(rows[0].product, "Sosis 4 Sisi");
   assert.equal(rows[0].units, 87);
   assert.equal(rows[0].sauceCount, 0);
   assert.equal(rows[1].stall, "路边");
+  assert.equal(rows[1].vehicle, "2号车");
   assert.equal(rows[1].product, "普通淀粉肠");
   assert.equal(rows[1].sauceCount, 8);
 });
@@ -115,6 +117,34 @@ test("real sosis sales seed imports into analysis entries", () => {
   assert.equal(rows.reduce((sum, row) => sum + row.units, 0), 2845);
   assert.equal(rows.at(-1).product, "普通淀粉肠");
   assert.equal(rows.at(-1).sauceCount, 9);
+});
+
+test("filterEntriesByVehicle returns one car or all cars", () => {
+  const rows = parseCsvRows(`date,location,product,price,quantity,sauce_count
+2026-07-13,夜市,Sosis 4 Sisi,8000,22,
+2026-07-13,路边,普通淀粉肠,5000,30,9`);
+
+  assert.equal(filterEntriesByVehicle(rows, "all").length, 2);
+  assert.equal(filterEntriesByVehicle(rows, "1号车").length, 1);
+  assert.equal(filterEntriesByVehicle(rows, "1号车")[0].units, 22);
+  assert.equal(filterEntriesByVehicle(rows, "2号车")[0].units, 30);
+});
+
+test("summarizeBusiness aggregates same-day rows when viewing all cars", () => {
+  const rows = parseCsvRows(`date,location,product,price,quantity,sauce_count
+2026-07-12,夜市,Sosis 4 Sisi,8000,87,
+2026-07-12,路边,普通淀粉肠,5000,36,8
+2026-07-13,夜市,Sosis 4 Sisi,8000,22,
+2026-07-13,路边,普通淀粉肠,5000,30,9`);
+
+  const allCars = summarizeBusiness(rows, new Date("2026-07-14T08:00:00+07:00"));
+  const carOne = summarizeBusiness(filterEntriesByVehicle(rows, "1号车"), new Date("2026-07-14T08:00:00+07:00"));
+  const carTwo = summarizeBusiness(filterEntriesByVehicle(rows, "2号车"), new Date("2026-07-14T08:00:00+07:00"));
+
+  assert.equal(allCars.today.units, 52);
+  assert.equal(allCars.today.revenue, 326000);
+  assert.equal(carOne.today.units, 22);
+  assert.equal(carTwo.today.units, 30);
 });
 
 test("toCsvRows exports rows that can be imported again", () => {
