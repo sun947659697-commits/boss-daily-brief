@@ -1,4 +1,4 @@
-const CACHE_NAME = "boss-daily-brief-v0-3";
+const CACHE_NAME = "boss-daily-brief-v0-4";
 const ASSETS = [
   "./",
   "./index.html",
