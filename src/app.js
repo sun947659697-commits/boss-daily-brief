@@ -1,6 +1,8 @@
 import { normalizeEntry, parseCsvRows, summarizeBusiness, toCsvRows } from "./analytics.js";
+import { translate, translateGeneratedText, translateList } from "./i18n.js";
 
 const STORAGE_KEY = "boss-daily-brief-entries";
+const LANGUAGE_KEY = "boss-daily-brief-language";
 
 const sampleEntries = [
   { date: "2026-07-07", stall: "Night Market", units: 42, price: 8000, cost: 3300, extraCost: 15000, weather: "rain", traffic: "low", staff: 1, inventory: 25, returningCustomers: 3, promo: false, note: "Rain started after 18:00" },
@@ -33,16 +35,14 @@ const elements = {
   sampleButton: document.querySelector("#sampleButton"),
   exportButton: document.querySelector("#exportButton"),
   importInput: document.querySelector("#importInput"),
-  clearButton: document.querySelector("#clearButton")
+  clearButton: document.querySelector("#clearButton"),
+  languageSelect: document.querySelector("#languageSelect")
 };
 
 let entries = loadEntries();
+let language = loadLanguage();
 
-elements.todayLabel.textContent = new Intl.DateTimeFormat("en", {
-  weekday: "short",
-  day: "2-digit",
-  month: "short"
-}).format(new Date());
+elements.languageSelect.value = language;
 elements.dateInput.value = new Date().toISOString().slice(0, 10);
 
 render();
@@ -66,8 +66,14 @@ elements.sampleButton.addEventListener("click", () => {
   render();
 });
 
+elements.languageSelect.addEventListener("change", (event) => {
+  language = event.target.value;
+  localStorage.setItem(LANGUAGE_KEY, language);
+  render();
+});
+
 elements.clearButton.addEventListener("click", () => {
-  if (!confirm("Clear all local Boss records on this device?")) return;
+  if (!confirm(translate("confirm.clear", language))) return;
   entries = [];
   saveEntries(entries);
   render();
@@ -94,28 +100,29 @@ elements.importInput.addEventListener("change", async (event) => {
 });
 
 function render() {
+  applyTranslations();
   const summary = summarizeBusiness(entries);
-  const firstReason = summary.reasons[0] || "Add more records to improve Boss recommendations.";
+  const firstReason = translateGeneratedText(summary.reasons[0], language) || translate("fallback.reason", language);
 
   elements.businessIndex.textContent = summary.businessIndex;
-  elements.briefTitle.textContent = summary.oneThing;
+  elements.briefTitle.textContent = translateGeneratedText(summary.oneThing, language);
   elements.briefReason.textContent = firstReason;
   elements.unitsMetric.textContent = number(summary.today.units);
   elements.revenueMetric.textContent = rupiah(summary.today.revenue);
   elements.profitMetric.textContent = rupiah(summary.today.profit);
-  elements.unitsDelta.textContent = deltaText(summary.comparison.previousDay.unitsDelta, "units");
+  elements.unitsDelta.textContent = deltaText(summary.comparison.previousDay.unitsDelta, translate("metric.units", language));
   elements.revenueDelta.textContent = deltaText(summary.comparison.previousDay.revenueDelta, "Rp");
   elements.profitDelta.textContent = deltaText(summary.comparison.previousDay.profitDelta, "Rp");
-  elements.statusChip.textContent = summary.status;
+  elements.statusChip.textContent = translate(`status.${summary.status}`, language);
 
-  renderList(elements.riskList, summary.risks, "No major risk detected yet.");
-  renderList(elements.reasonList, summary.reasons, "Boss needs more records to explain trends.");
+  renderList(elements.riskList, translateList(summary.risks, language), translate("fallback.risk", language));
+  renderList(elements.reasonList, translateList(summary.reasons, language), translate("fallback.evidence", language));
   renderChart(summary.trend30);
 }
 
 function renderChart(trend) {
   if (!trend.length) {
-    elements.trendChart.innerHTML = `<text x="24" y="110" fill="#637069" font-size="24">No data yet</text>`;
+    elements.trendChart.innerHTML = `<text x="24" y="110" fill="#637069" font-size="24">${translate("chart.empty", language)}</text>`;
     return;
   }
 
@@ -140,8 +147,8 @@ function renderChart(trend) {
     <path class="chart-area" d="${area}"></path>
     <path class="chart-line" d="${path}"></path>
     <circle class="chart-dot" cx="${lastX}" cy="${lastY}" r="8"></circle>
-    <text x="${padding}" y="24" fill="#637069" font-size="18">High ${max}</text>
-    <text x="${padding}" y="${height - 4}" fill="#637069" font-size="18">Low ${min}</text>
+    <text x="${padding}" y="24" fill="#637069" font-size="18">${translate("chart.high", language)} ${max}</text>
+    <text x="${padding}" y="${height - 4}" fill="#637069" font-size="18">${translate("chart.low", language)} ${min}</text>
   `;
 }
 
@@ -161,6 +168,32 @@ function loadEntries() {
   } catch {
     return [];
   }
+}
+
+function loadLanguage() {
+  const stored = localStorage.getItem(LANGUAGE_KEY);
+  if (["zh", "id", "en"].includes(stored)) return stored;
+  const browserLanguage = navigator.language.toLowerCase();
+  if (browserLanguage.startsWith("zh")) return "zh";
+  if (browserLanguage.startsWith("id")) return "id";
+  return "en";
+}
+
+function applyTranslations() {
+  document.documentElement.lang = language;
+  document.title = `Boss ${translate("app.title", language)}`;
+  elements.todayLabel.textContent = new Intl.DateTimeFormat(language === "zh" ? "zh-CN" : language, {
+    weekday: "short",
+    day: "2-digit",
+    month: "short"
+  }).format(new Date());
+
+  document.querySelectorAll("[data-i18n]").forEach((node) => {
+    node.textContent = translate(node.dataset.i18n, language);
+  });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((node) => {
+    node.setAttribute("placeholder", translate(node.dataset.i18nPlaceholder, language));
+  });
 }
 
 function saveEntries(nextEntries) {
@@ -193,10 +226,10 @@ function number(value) {
 }
 
 function deltaText(value, suffix) {
-  if (!value) return "No change";
+  if (!value) return translate("delta.noChange", language);
   const sign = value > 0 ? "+" : "";
-  if (suffix === "Rp") return `${sign}${rupiah(value)} vs previous`;
-  return `${sign}${number(value)} ${suffix} vs previous`;
+  if (suffix === "Rp") return `${sign}${rupiah(value)} ${translate("delta.previous", language)}`;
+  return `${sign}${number(value)} ${suffix} ${translate("delta.previous", language)}`;
 }
 
 function registerServiceWorker() {
