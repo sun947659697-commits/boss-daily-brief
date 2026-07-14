@@ -3,17 +3,7 @@ import { translate, translateGeneratedText, translateList } from "./i18n.js";
 
 const STORAGE_KEY = "boss-daily-brief-entries";
 const LANGUAGE_KEY = "boss-daily-brief-language";
-
-const sampleEntries = [
-  { date: "2026-07-07", stall: "Night Market", units: 42, price: 8000, cost: 3300, extraCost: 15000, weather: "rain", traffic: "low", staff: 1, inventory: 25, returningCustomers: 3, promo: false, note: "Rain started after 18:00" },
-  { date: "2026-07-08", stall: "Night Market", units: 49, price: 8000, cost: 3300, extraCost: 11000, weather: "cloudy", traffic: "normal", staff: 1, inventory: 31, returningCustomers: 4, promo: false, note: "Normal day" },
-  { date: "2026-07-09", stall: "Roadside", units: 53, price: 8000, cost: 3300, extraCost: 13000, weather: "sunny", traffic: "normal", staff: 2, inventory: 22, returningCustomers: 5, promo: true, note: "Small bundle promo" },
-  { date: "2026-07-10", stall: "Night Market", units: 61, price: 8000, cost: 3300, extraCost: 12000, weather: "sunny", traffic: "high", staff: 2, inventory: 20, returningCustomers: 6, promo: false, note: "High student traffic" },
-  { date: "2026-07-11", stall: "Night Market", units: 57, price: 8000, cost: 3300, extraCost: 14000, weather: "rain", traffic: "normal", staff: 2, inventory: 19, returningCustomers: 6, promo: false, note: "Rain at night" },
-  { date: "2026-07-12", stall: "Roadside", units: 64, price: 8000, cost: 3300, extraCost: 12000, weather: "sunny", traffic: "high", staff: 2, inventory: 17, returningCustomers: 8, promo: false, note: "BBQ sold fast" },
-  { date: "2026-07-13", stall: "Night Market", units: 51, price: 8000, cost: 3300, extraCost: 12000, weather: "cloudy", traffic: "normal", staff: 2, inventory: 40, returningCustomers: 5, promo: true, note: "Bundle promo" },
-  { date: "2026-07-14", stall: "Night Market", units: 58, price: 8000, cost: 3300, extraCost: 10000, weather: "sunny", traffic: "high", staff: 2, inventory: 18, returningCustomers: 7, promo: false, note: "BBQ sold fastest" }
-];
+const REAL_DATA_URL = "./data/sosis-sales.csv?v=0.3";
 
 const elements = {
   todayLabel: document.querySelector("#todayLabel"),
@@ -46,6 +36,7 @@ elements.languageSelect.value = language;
 elements.dateInput.value = new Date().toISOString().slice(0, 10);
 
 render();
+hydrateRealSalesData();
 registerServiceWorker();
 
 elements.entryForm.addEventListener("submit", (event) => {
@@ -60,10 +51,8 @@ elements.entryForm.addEventListener("submit", (event) => {
   render();
 });
 
-elements.sampleButton.addEventListener("click", () => {
-  entries = sampleEntries;
-  saveEntries(entries);
-  render();
+elements.sampleButton.addEventListener("click", async () => {
+  await loadRealSalesData({ overwrite: false });
 });
 
 elements.languageSelect.addEventListener("change", (event) => {
@@ -118,6 +107,27 @@ function render() {
   renderList(elements.riskList, translateList(summary.risks, language), translate("fallback.risk", language));
   renderList(elements.reasonList, translateList(summary.reasons, language), translate("fallback.evidence", language));
   renderChart(summary.trend30);
+}
+
+async function hydrateRealSalesData() {
+  if (entries.length) return;
+  await loadRealSalesData({ overwrite: true });
+}
+
+async function loadRealSalesData({ overwrite }) {
+  elements.sampleButton.disabled = true;
+  try {
+    const response = await fetch(REAL_DATA_URL, { cache: "no-store" });
+    if (!response.ok) throw new Error(`Unable to load sales data: ${response.status}`);
+    const realEntries = parseCsvRows(await response.text());
+    entries = overwrite ? realEntries : mergeEntries(entries, realEntries);
+    saveEntries(entries);
+    render();
+  } catch (error) {
+    console.error(error);
+  } finally {
+    elements.sampleButton.disabled = false;
+  }
 }
 
 function renderChart(trend) {
@@ -201,14 +211,17 @@ function saveEntries(nextEntries) {
 }
 
 function upsertEntry(currentEntries, entry) {
-  return mergeEntries(currentEntries.filter((item) => !(item.date === entry.date && item.stall === entry.stall)), [entry]);
+  return mergeEntries(currentEntries.filter((item) => {
+    const normalized = normalizeEntry(item);
+    return !(normalized.date === entry.date && normalized.stall === entry.stall && normalized.product === entry.product);
+  }), [entry]);
 }
 
 function mergeEntries(currentEntries, newEntries) {
   const map = new Map();
   for (const entry of [...currentEntries, ...newEntries]) {
     const normalized = normalizeEntry(entry);
-    map.set(`${normalized.date}-${normalized.stall}`, normalized);
+    map.set(`${normalized.date}-${normalized.stall}-${normalized.product}`, normalized);
   }
   return [...map.values()].sort((a, b) => a.date.localeCompare(b.date));
 }
