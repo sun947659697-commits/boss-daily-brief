@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#15241f" />
     <title>Boss Daily Brief</title>
     <link rel="manifest" href="./manifest.webmanifest" />
-    <link rel="stylesheet" href="./styles.css?v=0.3" />
+    <link rel="stylesheet" href="./styles.css?v=0.4" />
     <link rel="icon" href="./icons/icon.svg" />
   </head>
   <body>
@@ -23,6 +23,14 @@
               <option value="zh">中文</option>
               <option value="id">Indonesia</option>
               <option value="en">English</option>
+            </select>
+          </label>
+          <label class="language-control">
+            <span data-i18n="app.vehicle">Vehicle</span>
+            <select id="vehicleFilter" aria-label="Vehicle">
+              <option value="all" data-i18n="option.vehicle.all">All cars</option>
+              <option value="1号车" data-i18n="option.vehicle.one">Car 1</option>
+              <option value="2号车" data-i18n="option.vehicle.two">Car 2</option>
             </select>
           </label>
           <div class="date-pill" id="todayLabel"></div>
@@ -99,6 +107,13 @@
             <label>
               <span data-i18n="form.date">Date</span>
               <input id="dateInput" name="date" type="date" required />
+            </label>
+            <label>
+              <span data-i18n="form.vehicle">Vehicle</span>
+              <select name="vehicle">
+                <option value="1号车" data-i18n="option.vehicle.one">Car 1</option>
+                <option value="2号车" data-i18n="option.vehicle.two">Car 2</option>
+              </select>
             </label>
             <label>
               <span data-i18n="form.stall">Stall</span>
@@ -187,6 +202,6 @@
       </section>
     </main>
 
-    <script type="module" src="./src/app.js?v=0.3"></script>
+    <script type="module" src="./src/app.js?v=0.4"></script>
   </body>
 </html>
