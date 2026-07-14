@@ -13,37 +13,47 @@
     <main class="app-shell">
       <header class="topbar">
         <div>
-          <p class="eyebrow">Boss V0.1</p>
-          <h1>Daily Brief</h1>
+          <p class="eyebrow" data-i18n="app.version">Boss V0.1</p>
+          <h1 data-i18n="app.title">Daily Brief</h1>
         </div>
-        <div class="date-pill" id="todayLabel"></div>
+        <div class="topbar-actions">
+          <label class="language-control">
+            <span data-i18n="app.language">Language</span>
+            <select id="languageSelect" aria-label="Language">
+              <option value="zh">中文</option>
+              <option value="id">Indonesia</option>
+              <option value="en">English</option>
+            </select>
+          </label>
+          <div class="date-pill" id="todayLabel"></div>
+        </div>
       </header>
 
       <section class="brief-panel" aria-labelledby="briefTitle">
         <div class="index-dial" aria-label="Business index">
           <span id="businessIndex">0</span>
-          <small>score</small>
+          <small data-i18n="dial.score">score</small>
         </div>
         <div class="brief-copy">
-          <p class="eyebrow">Today's one decision</p>
-          <h2 id="briefTitle">Add today's first sales record.</h2>
-          <p id="briefReason">Boss needs your data before it can learn your business.</p>
+          <p class="eyebrow" data-i18n="brief.eyebrow">Today's one decision</p>
+          <h2 id="briefTitle" data-i18n="brief.empty">Add today's first sales record.</h2>
+          <p id="briefReason" data-i18n="brief.emptyReason">Boss needs your data before it can learn your business.</p>
         </div>
       </section>
 
       <section class="metrics-grid" aria-label="Today metrics">
         <article class="metric">
-          <span>Units</span>
+          <span data-i18n="metric.units">Units</span>
           <strong id="unitsMetric">0</strong>
           <small id="unitsDelta">No comparison</small>
         </article>
         <article class="metric">
-          <span>Revenue</span>
+          <span data-i18n="metric.revenue">Revenue</span>
           <strong id="revenueMetric">Rp0</strong>
           <small id="revenueDelta">No comparison</small>
         </article>
         <article class="metric">
-          <span>Profit</span>
+          <span data-i18n="metric.profit">Profit</span>
           <strong id="profitMetric">Rp0</strong>
           <small id="profitDelta">No comparison</small>
         </article>
@@ -52,8 +62,8 @@
       <section class="chart-panel" aria-labelledby="trendTitle">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">Owner K-line</p>
-            <h2 id="trendTitle">30-day sales trend</h2>
+            <p class="eyebrow" data-i18n="chart.eyebrow">Owner K-line</p>
+            <h2 id="trendTitle" data-i18n="chart.title">30-day sales trend</h2>
           </div>
           <span class="status-chip" id="statusChip">New</span>
         </div>
@@ -63,13 +73,13 @@
       <section class="split-panel">
         <article class="list-panel">
           <div class="section-heading">
-            <h2>Risks</h2>
+            <h2 data-i18n="section.risks">Risks</h2>
           </div>
           <ul id="riskList"></ul>
         </article>
         <article class="list-panel">
           <div class="section-heading">
-            <h2>Evidence</h2>
+            <h2 data-i18n="section.evidence">Evidence</h2>
           </div>
           <ul id="reasonList"></ul>
         </article>
@@ -78,91 +88,91 @@
       <section class="form-panel" aria-labelledby="entryTitle">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">Record</p>
-            <h2 id="entryTitle">Add daily data</h2>
+            <p class="eyebrow" data-i18n="section.record">Record</p>
+            <h2 id="entryTitle" data-i18n="form.title">Add daily data</h2>
           </div>
-          <button class="ghost-button" id="sampleButton" type="button">Load sample</button>
+          <button class="ghost-button" id="sampleButton" type="button" data-i18n="action.sample">Load sample</button>
         </div>
 
         <form id="entryForm">
           <div class="form-grid">
             <label>
-              Date
+              <span data-i18n="form.date">Date</span>
               <input id="dateInput" name="date" type="date" required />
             </label>
             <label>
-              Stall
+              <span data-i18n="form.stall">Stall</span>
               <select id="stallInput" name="stall">
-                <option>Night Market</option>
-                <option>Roadside</option>
-                <option>Main Stall</option>
+                <option data-i18n="option.stall.night">Night Market</option>
+                <option data-i18n="option.stall.roadside">Roadside</option>
+                <option data-i18n="option.stall.main">Main Stall</option>
               </select>
             </label>
             <label>
-              Units sold
+              <span data-i18n="form.units">Units sold</span>
               <input name="units" type="number" min="0" inputmode="numeric" required />
             </label>
             <label>
-              Price / unit
+              <span data-i18n="form.price">Price / unit</span>
               <input name="price" type="number" min="0" inputmode="numeric" value="8000" required />
             </label>
             <label>
-              Cost / unit
+              <span data-i18n="form.cost">Cost / unit</span>
               <input name="cost" type="number" min="0" inputmode="numeric" value="3300" required />
             </label>
             <label>
-              Extra cost
+              <span data-i18n="form.extraCost">Extra cost</span>
               <input name="extraCost" type="number" min="0" inputmode="numeric" value="0" />
             </label>
             <label>
-              Weather
+              <span data-i18n="form.weather">Weather</span>
               <select name="weather">
-                <option value="sunny">Sunny</option>
-                <option value="cloudy">Cloudy</option>
-                <option value="rain">Rain</option>
-                <option value="normal">Normal</option>
+                <option value="sunny" data-i18n="option.weather.sunny">Sunny</option>
+                <option value="cloudy" data-i18n="option.weather.cloudy">Cloudy</option>
+                <option value="rain" data-i18n="option.weather.rain">Rain</option>
+                <option value="normal" data-i18n="option.weather.normal">Normal</option>
               </select>
             </label>
             <label>
-              Traffic
+              <span data-i18n="form.traffic">Traffic</span>
               <select name="traffic">
-                <option value="normal">Normal</option>
-                <option value="high">High</option>
-                <option value="low">Low</option>
+                <option value="normal" data-i18n="option.traffic.normal">Normal</option>
+                <option value="high" data-i18n="option.traffic.high">High</option>
+                <option value="low" data-i18n="option.traffic.low">Low</option>
               </select>
             </label>
             <label>
-              Staff
+              <span data-i18n="form.staff">Staff</span>
               <input name="staff" type="number" min="0" inputmode="numeric" value="1" />
             </label>
             <label>
-              Inventory left
+              <span data-i18n="form.inventory">Inventory left</span>
               <input name="inventory" type="number" min="0" inputmode="numeric" value="0" />
             </label>
             <label>
-              Returning customers
+              <span data-i18n="form.returningCustomers">Returning customers</span>
               <input name="returningCustomers" type="number" min="0" inputmode="numeric" value="0" />
             </label>
             <label class="check-row">
               <input name="promo" type="checkbox" />
-              Promo active
+              <span data-i18n="form.promo">Promo active</span>
             </label>
           </div>
           <label>
-            Note
-            <textarea name="note" rows="3" placeholder="Rain after 18:00, BBQ sold fast, school event..."></textarea>
+            <span data-i18n="form.note">Note</span>
+            <textarea name="note" rows="3" placeholder="Rain after 18:00, BBQ sold fast, school event..." data-i18n-placeholder="form.notePlaceholder"></textarea>
           </label>
-          <button class="primary-button" type="submit">Save daily record</button>
+          <button class="primary-button" type="submit" data-i18n="action.save">Save daily record</button>
         </form>
       </section>
 
       <section class="tools-panel">
-        <button class="ghost-button" id="exportButton" type="button">Export CSV</button>
+        <button class="ghost-button" id="exportButton" type="button" data-i18n="action.export">Export CSV</button>
         <label class="file-button">
-          Import CSV
+          <span data-i18n="action.import">Import CSV</span>
           <input id="importInput" type="file" accept=".csv,text/csv" />
         </label>
-        <button class="danger-button" id="clearButton" type="button">Clear local data</button>
+        <button class="danger-button" id="clearButton" type="button" data-i18n="action.clear">Clear local data</button>
       </section>
     </main>
 
