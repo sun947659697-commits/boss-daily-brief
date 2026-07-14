@@ -1,6 +1,7 @@
 const CSV_HEADERS = [
   "date",
   "stall",
+  "product",
   "units",
   "price",
   "cost",
@@ -10,6 +11,7 @@ const CSV_HEADERS = [
   "staff",
   "inventory",
   "returningCustomers",
+  "sauceCount",
   "promo",
   "note"
 ];
@@ -67,8 +69,8 @@ export function parseCsvRows(csvText) {
   const rows = parseCsv(csvText.trim());
   if (rows.length < 2) return [];
 
-  const headers = rows[0].map((header) => header.trim());
-  return rows.slice(1).filter((row) => row.some(Boolean)).map((row) => {
+  const headers = rows[0].map((header) => canonicalHeader(header.trim()));
+  return rows.slice(1).filter((row) => row.some(Boolean)).filter((row) => hasRecordedUnits(headers, row)).map((row) => {
     const record = Object.fromEntries(headers.map((header, index) => [header, row[index] ?? ""]));
     return normalizeEntry(record);
   });
@@ -93,6 +95,7 @@ export function normalizeEntry(entry) {
   return {
     date: String(entry.date || toDateKey(new Date())),
     stall: String(entry.stall || "Main Stall"),
+    product: String(entry.product || "Sosis"),
     units,
     price,
     cost,
@@ -102,6 +105,7 @@ export function normalizeEntry(entry) {
     staff: toNumber(entry.staff || 1),
     inventory: toNumber(entry.inventory),
     returningCustomers: toNumber(entry.returningCustomers),
+    sauceCount: toNumber(entry.sauceCount ?? entry.sauce_count),
     promo: parseBoolean(entry.promo),
     note: String(entry.note || ""),
     revenue,
@@ -235,6 +239,23 @@ function toNumber(value) {
 function parseBoolean(value) {
   if (typeof value === "boolean") return value;
   return ["true", "yes", "1", "y"].includes(String(value).trim().toLowerCase());
+}
+
+function canonicalHeader(header) {
+  const normalized = header.trim().toLowerCase();
+  const aliases = {
+    location: "stall",
+    quantity: "units",
+    sauce_count: "sauceCount",
+    saucecount: "sauceCount"
+  };
+  return aliases[normalized] || header;
+}
+
+function hasRecordedUnits(headers, row) {
+  const unitsIndex = headers.indexOf("units");
+  if (unitsIndex === -1) return true;
+  return String(row[unitsIndex] ?? "").trim() !== "";
 }
 
 function clamp(value, min, max) {
