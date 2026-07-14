@@ -1,0 +1,360 @@
+:root {
+  color-scheme: light;
+  --ink: #17211d;
+  --muted: #637069;
+  --paper: #f7f4ec;
+  --panel: #fffdf7;
+  --line: #ded8ca;
+  --field: #f1ede3;
+  --green: #1f6f50;
+  --mint: #9dd9b5;
+  --amber: #d98b2b;
+  --red: #b5483c;
+  --shadow: 0 16px 40px rgba(31, 44, 37, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    linear-gradient(145deg, rgba(157, 217, 181, 0.22), transparent 32rem),
+    var(--paper);
+  color: var(--ink);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+.file-button {
+  min-height: 44px;
+}
+
+.app-shell {
+  width: min(100%, 980px);
+  margin: 0 auto;
+  padding: 18px 14px 28px;
+}
+
+.topbar,
+.section-heading,
+.brief-panel,
+.tools-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.topbar {
+  padding: 8px 2px 16px;
+}
+
+.eyebrow {
+  margin: 0 0 5px;
+  color: var(--green);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 0;
+  font-size: clamp(2rem, 8vw, 4.6rem);
+  line-height: 0.92;
+}
+
+h2 {
+  margin-bottom: 8px;
+  font-size: 1.18rem;
+}
+
+.date-pill,
+.status-chip {
+  flex: 0 0 auto;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 9px 12px;
+  background: rgba(255, 253, 247, 0.8);
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.brief-panel,
+.chart-panel,
+.form-panel,
+.list-panel,
+.metric,
+.tools-panel {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 253, 247, 0.9);
+  box-shadow: var(--shadow);
+}
+
+.brief-panel {
+  align-items: stretch;
+  padding: 14px;
+}
+
+.index-dial {
+  display: grid;
+  place-items: center;
+  width: 118px;
+  height: 118px;
+  flex: 0 0 118px;
+  align-self: flex-start;
+  border-radius: 8px;
+  background: var(--ink);
+  color: var(--mint);
+}
+
+.index-dial span {
+  font-size: 2.6rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.index-dial small {
+  color: rgba(255, 255, 255, 0.72);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.brief-copy {
+  flex: 1;
+  padding: 7px 2px;
+}
+
+.brief-copy h2 {
+  font-size: clamp(1.45rem, 7vw, 3.2rem);
+  line-height: 1;
+}
+
+.brief-copy p:last-child {
+  margin-bottom: 0;
+  color: var(--muted);
+}
+
+.metrics-grid,
+.split-panel,
+.form-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.metrics-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 10px;
+}
+
+.metric {
+  padding: 14px;
+}
+
+.metric span,
+label {
+  display: block;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.metric strong {
+  display: block;
+  margin: 8px 0 4px;
+  font-size: 1.35rem;
+}
+
+.metric small {
+  color: var(--muted);
+}
+
+.chart-panel,
+.form-panel,
+.list-panel,
+.tools-panel {
+  margin-top: 10px;
+  padding: 14px;
+}
+
+#trendChart {
+  width: 100%;
+  height: auto;
+  margin-top: 8px;
+  overflow: visible;
+}
+
+.chart-line {
+  fill: none;
+  stroke: var(--green);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.chart-area {
+  fill: rgba(31, 111, 80, 0.12);
+}
+
+.chart-dot {
+  fill: var(--amber);
+  stroke: var(--panel);
+  stroke-width: 4;
+}
+
+.chart-axis {
+  stroke: var(--line);
+  stroke-width: 2;
+}
+
+.split-panel {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+}
+
+li + li {
+  margin-top: 8px;
+}
+
+.form-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+label {
+  margin-top: 12px;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  margin-top: 6px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: var(--field);
+  color: var(--ink);
+  padding: 12px;
+  outline: none;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+button:focus-visible,
+.file-button:focus-within {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(31, 111, 80, 0.18);
+}
+
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  color: var(--ink);
+}
+
+.check-row input {
+  width: 20px;
+  margin: 0;
+}
+
+.primary-button,
+.ghost-button,
+.danger-button,
+.file-button {
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 11px 14px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.primary-button {
+  width: 100%;
+  margin-top: 14px;
+  background: var(--green);
+  color: white;
+}
+
+.ghost-button,
+.file-button {
+  background: var(--field);
+  color: var(--ink);
+}
+
+.danger-button {
+  background: rgba(181, 72, 60, 0.1);
+  color: var(--red);
+}
+
+.file-button {
+  display: inline-grid;
+  place-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.file-button input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.tools-panel {
+  justify-content: stretch;
+}
+
+.tools-panel > * {
+  flex: 1;
+}
+
+@media (max-width: 720px) {
+  .topbar {
+    align-items: flex-start;
+  }
+
+  .brief-panel,
+  .metrics-grid,
+  .split-panel,
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .metric:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .tools-panel {
+    display: grid;
+  }
+}

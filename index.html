@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#15241f" />
+    <title>Boss Daily Brief</title>
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="icon" href="./icons/icon.svg" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Boss V0.1</p>
+          <h1>Daily Brief</h1>
+        </div>
+        <div class="date-pill" id="todayLabel"></div>
+      </header>
+
+      <section class="brief-panel" aria-labelledby="briefTitle">
+        <div class="index-dial" aria-label="Business index">
+          <span id="businessIndex">0</span>
+          <small>score</small>
+        </div>
+        <div class="brief-copy">
+          <p class="eyebrow">Today's one decision</p>
+          <h2 id="briefTitle">Add today's first sales record.</h2>
+          <p id="briefReason">Boss needs your data before it can learn your business.</p>
+        </div>
+      </section>
+
+      <section class="metrics-grid" aria-label="Today metrics">
+        <article class="metric">
+          <span>Units</span>
+          <strong id="unitsMetric">0</strong>
+          <small id="unitsDelta">No comparison</small>
+        </article>
+        <article class="metric">
+          <span>Revenue</span>
+          <strong id="revenueMetric">Rp0</strong>
+          <small id="revenueDelta">No comparison</small>
+        </article>
+        <article class="metric">
+          <span>Profit</span>
+          <strong id="profitMetric">Rp0</strong>
+          <small id="profitDelta">No comparison</small>
+        </article>
+      </section>
+
+      <section class="chart-panel" aria-labelledby="trendTitle">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Owner K-line</p>
+            <h2 id="trendTitle">30-day sales trend</h2>
+          </div>
+          <span class="status-chip" id="statusChip">New</span>
+        </div>
+        <svg id="trendChart" viewBox="0 0 640 220" role="img" aria-label="Sales trend chart"></svg>
+      </section>
+
+      <section class="split-panel">
+        <article class="list-panel">
+          <div class="section-heading">
+            <h2>Risks</h2>
+          </div>
+          <ul id="riskList"></ul>
+        </article>
+        <article class="list-panel">
+          <div class="section-heading">
+            <h2>Evidence</h2>
+          </div>
+          <ul id="reasonList"></ul>
+        </article>
+      </section>
+
+      <section class="form-panel" aria-labelledby="entryTitle">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Record</p>
+            <h2 id="entryTitle">Add daily data</h2>
+          </div>
+          <button class="ghost-button" id="sampleButton" type="button">Load sample</button>
+        </div>
+
+        <form id="entryForm">
+          <div class="form-grid">
+            <label>
+              Date
+              <input id="dateInput" name="date" type="date" required />
+            </label>
+            <label>
+              Stall
+              <select id="stallInput" name="stall">
+                <option>Night Market</option>
+                <option>Roadside</option>
+                <option>Main Stall</option>
+              </select>
+            </label>
+            <label>
+              Units sold
+              <input name="units" type="number" min="0" inputmode="numeric" required />
+            </label>
+            <label>
+              Price / unit
+              <input name="price" type="number" min="0" inputmode="numeric" value="8000" required />
+            </label>
+            <label>
+              Cost / unit
+              <input name="cost" type="number" min="0" inputmode="numeric" value="3300" required />
+            </label>
+            <label>
+              Extra cost
+              <input name="extraCost" type="number" min="0" inputmode="numeric" value="0" />
+            </label>
+            <label>
+              Weather
+              <select name="weather">
+                <option value="sunny">Sunny</option>
+                <option value="cloudy">Cloudy</option>
+                <option value="rain">Rain</option>
+                <option value="normal">Normal</option>
+              </select>
+            </label>
+            <label>
+              Traffic
+              <select name="traffic">
+                <option value="normal">Normal</option>
+                <option value="high">High</option>
+                <option value="low">Low</option>
+              </select>
+            </label>
+            <label>
+              Staff
+              <input name="staff" type="number" min="0" inputmode="numeric" value="1" />
+            </label>
+            <label>
+              Inventory left
+              <input name="inventory" type="number" min="0" inputmode="numeric" value="0" />
+            </label>
+            <label>
+              Returning customers
+              <input name="returningCustomers" type="number" min="0" inputmode="numeric" value="0" />
+            </label>
+            <label class="check-row">
+              <input name="promo" type="checkbox" />
+              Promo active
+            </label>
+          </div>
+          <label>
+            Note
+            <textarea name="note" rows="3" placeholder="Rain after 18:00, BBQ sold fast, school event..."></textarea>
+          </label>
+          <button class="primary-button" type="submit">Save daily record</button>
+        </form>
+      </section>
+
+      <section class="tools-panel">
+        <button class="ghost-button" id="exportButton" type="button">Export CSV</button>
+        <label class="file-button">
+          Import CSV
+          <input id="importInput" type="file" accept=".csv,text/csv" />
+        </label>
+        <button class="danger-button" id="clearButton" type="button">Clear local data</button>
+      </section>
+    </main>
+
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>

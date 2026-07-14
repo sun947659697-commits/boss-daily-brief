@@ -1,0 +1,17 @@
+{
+  "name": "Boss Daily Brief",
+  "short_name": "Boss",
+  "description": "A daily decision dashboard for small business owners.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f7f4ec",
+  "theme_color": "#15241f",
+  "icons": [
+    {
+      "src": "./icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
