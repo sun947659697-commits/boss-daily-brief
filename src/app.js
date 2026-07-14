@@ -1,9 +1,10 @@
-import { normalizeEntry, parseCsvRows, summarizeBusiness, toCsvRows } from "./analytics.js";
+import { filterEntriesByVehicle, normalizeEntry, parseCsvRows, summarizeBusiness, toCsvRows } from "./analytics.js";
 import { translate, translateGeneratedText, translateList } from "./i18n.js";
 
 const STORAGE_KEY = "boss-daily-brief-entries";
 const LANGUAGE_KEY = "boss-daily-brief-language";
-const REAL_DATA_URL = "./data/sosis-sales.csv?v=0.3";
+const VEHICLE_KEY = "boss-daily-brief-vehicle-filter";
+const REAL_DATA_URL = "./data/sosis-sales.csv?v=0.4";
 
 const elements = {
   todayLabel: document.querySelector("#todayLabel"),
@@ -26,13 +27,16 @@ const elements = {
   exportButton: document.querySelector("#exportButton"),
   importInput: document.querySelector("#importInput"),
   clearButton: document.querySelector("#clearButton"),
-  languageSelect: document.querySelector("#languageSelect")
+  languageSelect: document.querySelector("#languageSelect"),
+  vehicleFilter: document.querySelector("#vehicleFilter")
 };
 
 let entries = loadEntries();
 let language = loadLanguage();
+let vehicleFilter = loadVehicleFilter();
 
 elements.languageSelect.value = language;
+elements.vehicleFilter.value = vehicleFilter;
 elements.dateInput.value = new Date().toISOString().slice(0, 10);
 
 render();
@@ -58,6 +62,12 @@ elements.sampleButton.addEventListener("click", async () => {
 elements.languageSelect.addEventListener("change", (event) => {
   language = event.target.value;
   localStorage.setItem(LANGUAGE_KEY, language);
+  render();
+});
+
+elements.vehicleFilter.addEventListener("change", (event) => {
+  vehicleFilter = event.target.value;
+  localStorage.setItem(VEHICLE_KEY, vehicleFilter);
   render();
 });
 
@@ -90,7 +100,8 @@ elements.importInput.addEventListener("change", async (event) => {
 
 function render() {
   applyTranslations();
-  const summary = summarizeBusiness(entries);
+  const visibleEntries = filterEntriesByVehicle(entries, vehicleFilter);
+  const summary = summarizeBusiness(visibleEntries);
   const firstReason = translateGeneratedText(summary.reasons[0], language) || translate("fallback.reason", language);
 
   elements.businessIndex.textContent = summary.businessIndex;
@@ -189,6 +200,12 @@ function loadLanguage() {
   return "en";
 }
 
+function loadVehicleFilter() {
+  const stored = localStorage.getItem(VEHICLE_KEY);
+  if (["all", "1号车", "2号车"].includes(stored)) return stored;
+  return "all";
+}
+
 function applyTranslations() {
   document.documentElement.lang = language;
   document.title = `Boss ${translate("app.title", language)}`;
@@ -213,7 +230,7 @@ function saveEntries(nextEntries) {
 function upsertEntry(currentEntries, entry) {
   return mergeEntries(currentEntries.filter((item) => {
     const normalized = normalizeEntry(item);
-    return !(normalized.date === entry.date && normalized.stall === entry.stall && normalized.product === entry.product);
+    return !(normalized.date === entry.date && normalized.vehicle === entry.vehicle && normalized.stall === entry.stall && normalized.product === entry.product);
   }), [entry]);
 }
 
@@ -221,7 +238,7 @@ function mergeEntries(currentEntries, newEntries) {
   const map = new Map();
   for (const entry of [...currentEntries, ...newEntries]) {
     const normalized = normalizeEntry(entry);
-    map.set(`${normalized.date}-${normalized.stall}-${normalized.product}`, normalized);
+    map.set(`${normalized.date}-${normalized.vehicle}-${normalized.stall}-${normalized.product}`, normalized);
   }
   return [...map.values()].sort((a, b) => a.date.localeCompare(b.date));
 }
