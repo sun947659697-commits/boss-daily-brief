@@ -1,4 +1,4 @@
-const CACHE_NAME = "boss-daily-brief-v0-2";
+const CACHE_NAME = "boss-daily-brief-v0-3";
 const ASSETS = [
   "./",
   "./index.html",
@@ -7,6 +7,7 @@ const ASSETS = [
   "./src/app.js",
   "./src/analytics.js",
   "./src/i18n.js",
+  "./data/sosis-sales.csv",
   "./icons/icon.svg"
 ];
 

@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#15241f" />
     <title>Boss Daily Brief</title>
     <link rel="manifest" href="./manifest.webmanifest" />
-    <link rel="stylesheet" href="./styles.css?v=0.2" />
+    <link rel="stylesheet" href="./styles.css?v=0.3" />
     <link rel="icon" href="./icons/icon.svg" />
   </head>
   <body>
@@ -91,7 +91,7 @@
             <p class="eyebrow" data-i18n="section.record">Record</p>
             <h2 id="entryTitle" data-i18n="form.title">Add daily data</h2>
           </div>
-          <button class="ghost-button" id="sampleButton" type="button" data-i18n="action.sample">Load sample</button>
+          <button class="ghost-button" id="sampleButton" type="button" data-i18n="action.sample">Load real data</button>
         </div>
 
         <form id="entryForm">
@@ -103,9 +103,16 @@
             <label>
               <span data-i18n="form.stall">Stall</span>
               <select id="stallInput" name="stall">
-                <option data-i18n="option.stall.night">Night Market</option>
-                <option data-i18n="option.stall.roadside">Roadside</option>
-                <option data-i18n="option.stall.main">Main Stall</option>
+                <option value="夜市" data-i18n="option.stall.night">Night Market</option>
+                <option value="路边" data-i18n="option.stall.roadside">Roadside</option>
+                <option value="主摊位" data-i18n="option.stall.main">Main Stall</option>
+              </select>
+            </label>
+            <label>
+              <span data-i18n="form.product">Product</span>
+              <select name="product">
+                <option value="普通淀粉肠" data-i18n="option.product.normal">Normal sosis</option>
+                <option value="Sosis 4 Sisi" data-i18n="option.product.fourSide">Sosis 4 Sisi</option>
               </select>
             </label>
             <label>
@@ -153,6 +160,10 @@
               <span data-i18n="form.returningCustomers">Returning customers</span>
               <input name="returningCustomers" type="number" min="0" inputmode="numeric" value="0" />
             </label>
+            <label>
+              <span data-i18n="form.sauceCount">Sauce count</span>
+              <input name="sauceCount" type="number" min="0" inputmode="numeric" value="0" />
+            </label>
             <label class="check-row">
               <input name="promo" type="checkbox" />
               <span data-i18n="form.promo">Promo active</span>
@@ -176,6 +187,6 @@
       </section>
     </main>
 
-    <script type="module" src="./src/app.js?v=0.2"></script>
+    <script type="module" src="./src/app.js?v=0.3"></script>
   </body>
 </html>
